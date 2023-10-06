@@ -8,78 +8,51 @@ import java.util.List;
 //import javax.transaction.Transaction;
 
 public class FilmeModelDAO implements  IFilmeModelDAO {
-    private EntityManager em;
+    private final EntityManager em;
     public FilmeModelDAO(EntityManager em) {
         this.em = em;
     }
 
-
-    @Override
-    public FilmeModel findByTitulo(String titulo) {
-        return em.createQuery("FROM FilmeModel WHERE titulo = :titulo", FilmeModel.class)
-                .setParameter("titulo", titulo)
-                .uniqueResult();
-    }
-
-
-    @Override
-    public List<FilmeModel> findAll() {
-        return em.createQuery("FROM FilmeModel", FilmeModel.class).list();
-    }
-
-    @Override
-    public boolean insert(FilmeModel f) {
-        Transaction transaction = null;
-        try {
-            transaction = session.beginTransaction();
-            session.save(f);
-            transaction.commit();
+    public boolean insert(FilmeModel filme) {
+        if (filme != null) {
+            this.em.persist(filme);
             return true;
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
+        } else {
             return false;
         }
     }
 
-
-    @Override
-    public boolean update(FilmeModel f) {
-        Transaction transaction = null;
-        try {
-            transaction = session.beginTransaction();
-            session.update(f);
-            transaction.commit();
-            return true;
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-            return false;
-        }
+    public boolean update(FilmeModel filme){
+        this.em.merge(filme);
+        return true;
     }
 
+    public boolean delete(FilmeModel filme){
+        filme = em.merge(filme);
+        this.em.remove(filme);
+        return true;
+    }
 
+    public FilmeModel findById(int id){
+        return em.find(FilmeModel.class, id);
+    }
+    public FilmeModel findByTitulo(String titulo){
+        String jpql = "SELECT p FROM FilmeModel AS p WHERE p.titulo = :nome";
+        return em.createQuery(jpql, FilmeModel.class)
+                .setParameter("nome", titulo)
+                .getSingleResult();
+    }
 
-    @Override
-    public boolean delete(FilmeModel f) {
-        Transaction transaction = null;
-        try {
-            transaction = em.beginTransaction();
-            em.delete(f);
-            transaction.commit();
-            return true;
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-            return false;
-        }
+    public List<FilmeModel> findAll(){
+        String jpql = "SELECT p FROM FilmeModel AS p";
+        return em.createQuery(jpql, FilmeModel.class).getResultList();
+    }
+    public List<FilmeModel> findByGeneroTitulo(String generoTitul){
+        String jpql = "SELECT p FROM FilmeModel AS p WHERE p.generoTitulo = ?1";
+        return em.createQuery(jpql, FilmeModel.class)
+                .setParameter(1, generoTitul).getResultList();
     }
 
 }
+
 

@@ -3,15 +3,18 @@ package Models;
 import javax.persistence.*;
 
 @Entity
-@Table(name="filme")
+@Table(name="filmes")
 public class FilmeModel{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @Column(nullable = false)
     private String titulo;
     private int anoLancamento;
+    @Column(nullable = false)
     private String dataLancamento;
     private int tempoTela;
+    @Column(nullable = false)
     private String generoTitulo;
     public FilmeModel(String titulo, int anoLancamento, String dataLancamento, int tempoTela, String generoTitulo){
         this.titulo = titulo;
